@@ -11,6 +11,20 @@ const url = 'https://memegen-link-examples-upleveled.netlify.app/';
 
 const response = await axios.get(url); // go to page
 const $ = cheerio.load(response.data); // load data on page
-const imgSrc = $('section img').attr('src'); // get first src attribute from img inside section
+const html = $(`img`).html('src'); // get first src attribute from img
 
-console.log(imgSrc);
+// push first 10 image urls to array:
+
+const loopArray = [];
+
+for (let i = 0; i <= 9; i++) {
+  loopArray.push(html[i].attribs.src);
+}
+
+console.log(loop);
+
+/* LOOP WITH LINKS WITHOUT ARRAY:
+
+for (let i = 0; i <= 9; i++) {
+  console.log(html[i].attribs.src);
+} */
