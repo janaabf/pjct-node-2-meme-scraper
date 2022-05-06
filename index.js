@@ -1,62 +1,47 @@
-// FIRST 10 IMG FROM WEBSITE URL: https://memegen-link-examples-upleveled.netlify.app/
+// THIS CODE FINDS AND DOWNLOADS FIRST 10 IMG FROM WEBSITE URL: https://memegen-link-examples-upleveled.netlify.app/
 
+// used libraries
 import fs from 'node:fs';
 import https from 'node:https';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
+// source
 const memePage = 'https://memegen-link-examples-upleveled.netlify.app/';
 
-// axios (to get html), cheerio to parse html:
-
+// (axios to) get html, (cheerio to) parse html:
 const response = await axios.get(memePage); // go to page
 const $ = cheerio.load(response.data); // load data on page
 const html = $(`img`).html('src'); // get first src attribute from img
 
 // push first 10 image urls to array:
-
 const memeUrls = [];
 
 for (let i = 0; i <= 9; i++) {
   memeUrls.push(html[i].attribs.src);
 }
 
-// const file1 = html[0].attribs['src'];
+// OPTIONAL: CONSOLE LOG FOUND LINKS:
+// console.log('> Found following image URLs for download:' + memeUrls);
 
-console.log(memeUrls);
-
-// create folder
-
-/* EXPLANATION OF CODE BELOW:
-
-Source: https://www.geeksforgeeks.org/how-to-create-a-directory-using-node-js/
-
-checks for errors while creating new directory (1st error directory already exists; 2nd error directory wasn't able to be created)
-
-1)  access file system, try to find path.
-2)  if path found --> access path & 'directory found'
-3)  if path not found --> error1, create a new directory & message 'directory created successfully'
-4)   if could not create new directory --> error2, throw error & message 'something went wrong!' */
-
+// access folder, or create new one, if it doesn't exist already
 const path = './memes';
 
 fs.access(path, (error) => {
-  // 1)
   if (error) {
     fs.mkdir(path, (err) => {
       if (err) {
-        console.log('something went wrong!'); // 4)
+        console.log('> something went wrong!');
       } else {
-        console.log('directory created successfully!'); // 3)
+        console.log('> directory created successfully!');
       }
     });
   } else {
-    console.log('directory found'); // 2)
+    console.log('> directory found');
   }
 });
 
-// create download function: https://scrapingant.com/blog/download-image-javascript
-
+// create download function
 function downloadImage(url, filepath) {
   return new Promise((resolve, reject) => {
     https.get(url, (res) => {
@@ -76,112 +61,15 @@ function downloadImage(url, filepath) {
   });
 }
 
-// download and save each image from memeUrl
-
+// download and save each image from memeUrls
 for (let i = 0; i < memeUrls.length; i++) {
   if (i < 9) {
     downloadImage(memeUrls[i], `./memes/0${i + 1}.jpg`)
-      .then(console.log)
+      .then(console.log(`downloaded image ${i + 1}`))
       .catch(console.error);
   } else {
     downloadImage(memeUrls[i], `./memes/${i + 1}.jpg`)
-      .then(console.log)
+      .then(console.log(`downloaded image ${i + 1}`))
       .catch(console.error);
   }
 }
-
-// ----------------------------alt code & notes---------------------------
-
-/*
-    LOOP WITH LINKS WITHOUT ARRAY:
-
-for (let i = 0; i <= 9; i++) {
-  console.log(html[i].attribs.src);
-}
-
-
-    DOWNLOAD IMAGE
-
-(not working)
------- vs 1
-
-
-
-async function download() {
-  const response = await fetch(url);
-  const buffer = await response.buffer();
-  fs.writeFile(`./memes/01.jpg`, buffer, () =>
-    console.log('finished downloading!'),
-  );
-}
-
-download(file1);
-
------- vs 2
-
-fs.writeFile('./memes/01.jpg', file1, (error) => {
-    if (error) {
-      console.log('something with the file did not work');
-    } else {
-      console.log(`Following Image was Downloaded: ${file1}`);
-    }
-  });
-
-------
-
-const downloadImg = (url, filename) => {
-  let client = http;
-  if (url.toString().indexOf('https') === 0) {
-    client = https;
-  }
-  client
-    .request(url, function (response) {
-      var data = new Stream();
-
-      response.on('data', function (chunk) {
-        data.push(chunk);
-      });
-
-      response.on('end', function () {
-        fs.writeFileSync(filename, data.read());
-      });
-    })
-    .end();
-};
-
-downloadImg(file1, '../memes/01.jpg');
-
------
-
-function saveImage(url, localPath) {
-  const file = fs.createWriteStream(localPath);
-  const request = https.get(url, function (response1) {
-    response1.pipe(file);
-  });
-}
-
-exports.saveImage(req, res) {
-  let image_path='../memes/01.jpg'+'.jpg';
-  fetchImage(req.body.profile_pic_url,image_path);
-  }
-
-
-/* async function download() {
-  const response = await fetch(url);
-  const buffer = await response.buffer();
-  fs.writeFile(`./memes/01.jpg`, buffer, () =>
-    console.log('finished downloading!'),
-  );
-}
-for (let i = 0; i <= 9; i++) {
-  download(memeUrls[i]);
-}
-
-// -----------
-
-// saveImage(
-//   'https://api.memegen.link/images/bad/your_meme_is_bad/and_you_should_feel_bad.jpg?width=300',
-//   './memes/01.jpg',
-// );
-
-*/
