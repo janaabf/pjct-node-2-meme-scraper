@@ -21,23 +21,23 @@ for (let i = 0; i <= 9; i++) {
   memeUrls.push(html[i].attribs.src);
 }
 
-// OPTIONAL: CONSOLE LOG FOUND LINKS:
+// FOR DEBUGGING: CONSOLE LOG FOUND LINKS:
 // console.log('> Found following image URLs for download:' + memeUrls);
 
 // access folder, or create new one, if it doesn't exist already
-const path = './memes';
+const memeFolderPath = './memes';
 
-fs.access(path, (error) => {
+fs.access(memeFolderPath, (error) => {
   if (error) {
-    fs.mkdir(path, (err) => {
+    fs.mkdir(memeFolderPath, (err) => {
       if (err) {
         console.log('> something went wrong!');
       } else {
-        console.log('> directory created successfully!');
+        console.log('> directory created and memes saved successfully');
       }
     });
   } else {
-    console.log('> directory found');
+    console.log('> memes saved in existing meme directory');
   }
 });
 
@@ -61,11 +61,11 @@ function downloadImage(url, filepath) {
   });
 }
 
-// download and save each image from memeUrls
+// download and save each image from array memeUrls
 for (let i = 0; i < memeUrls.length; i++) {
   if (i < 9) {
     downloadImage(memeUrls[i], `./memes/0${i + 1}.jpg`)
-      .then(console.log(`downloaded image ${i + 1}`))
+      .then(console.log(`downloaded image 0${i + 1}`))
       .catch(console.error);
   } else {
     downloadImage(memeUrls[i], `./memes/${i + 1}.jpg`)
